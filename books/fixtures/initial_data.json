@@ -1,0 +1,28 @@
+[
+  {
+    "model": "books.book",
+    "pk": 1,
+    "fields": {
+      "store": "Book Store A",
+      "title": "Book Title A",
+      "author": "Author A",
+      "genre": "Fiction",
+      "isbn": "1234567890123",
+      "price": "9.99",
+      "count": 10
+    }
+  },
+  {
+    "model": "books.book",
+    "pk": 2,
+    "fields": {
+      "store": "Book Store B",
+      "title": "Book Title B",
+      "author": "Author B",
+      "genre": "Non-Fiction",
+      "isbn": "9876543210987",
+      "price": "14.99",
+      "count": 5
+    }
+  }
+]

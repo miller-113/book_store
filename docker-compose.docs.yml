@@ -1,0 +1,16 @@
+services:
+  docs:
+    image: bookstoreaggregator_local_docs
+    container_name: bookstoreaggregator_local_docs
+    build:
+      context: .
+      dockerfile: ./compose/local/docs/Dockerfile
+    env_file:
+      - ./.envs/.local/.django
+    volumes:
+      - ./docs:/docs:z
+      - ./config:/app/config:z
+      - ./bookstoreaggregator:/app/bookstoreaggregator:z
+    ports:
+      - '9000:9000'
+    command: /start-docs
