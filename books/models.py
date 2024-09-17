@@ -6,10 +6,18 @@ def validate_integer_price(value):
     if value != int(value):
         raise ValidationError('The price must be integer')
 
+
+class Author(models.Model):
+    name = models.CharField(max_length=100)
+    book = models.ForeignKey('Book', related_name='authors', on_delete=models.CASCADE)
+
+    def __str__(self):
+        return self.name
+        
+        
 class Book(models.Model):
     store = models.CharField(max_length=100)
     title = models.CharField(max_length=200)
-    author = models.CharField(max_length=100)
     genre = models.CharField(max_length=100)
     isbn = models.CharField(max_length=13, unique=True)
     price = models.DecimalField(
