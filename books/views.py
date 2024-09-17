@@ -1,10 +1,17 @@
 from django.shortcuts import render, redirect
 from django.forms import formset_factory
-from django.db.models import Count
+from django.db.models import Count, F
 
 from .models import Book, Author, Tag
 from .forms import BookForm, AuthorInlineFormset
 
+
+
+
+def books_with_matching_authors(request):
+    books = Book.objects.filter(authors__first_name=F('authors__last_name')).distinct()
+
+    return render(request, 'books/books_with_matching_authors.html', {'books': books})
 
 def book_list(request):
     books = Book.objects.annotate(tag_count=Count('tags'))

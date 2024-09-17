@@ -1,0 +1,15 @@
+    <h1>Books with Authors Whose First Name Matches Their Last Name</h1>
+    <ul>
+        {% for book in books %}
+            <li>
+                <strong>{{ book.title }}</strong> - Authors:
+                <ul>
+                    {% for author in book.authors.all %}
+                        <li>{{ author.first_name }} {{ author.last_name }}</li>
+                    {% endfor %}
+                </ul>
+            </li>
+        {% empty %}
+            <li>No books found.</li>
+        {% endfor %}
+    </ul>

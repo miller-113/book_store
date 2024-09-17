@@ -16,7 +16,7 @@ class BookForm(forms.ModelForm):
 class AuthorForm(forms.ModelForm):
     class Meta:
         model = Author
-        fields = ['name']
+        fields = ['first_name', 'last_name']
 
 
 AuthorInlineFormset = inlineformset_factory(
