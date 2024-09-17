@@ -1,11 +1,18 @@
 from django.contrib import admin
-from .models import Book
+from .models import Book, Author, Tag
 
+@admin.register(Book)
 class BookAdmin(admin.ModelAdmin):
-    list_display = ('store', 'title', 'genre', 'isbn', 'price', 'count', 'author_list')
+    list_display = ('title', 'store', 'genre', 'isbn', 'price', 'count')
+    search_fields = ('title', 'isbn', 'store')
+    list_filter = ('genre',)
 
-    def author_list(self, obj):
-        return ", ".join(author.name for author in obj.authors.all())
-    author_list.short_description = 'Authors'
+@admin.register(Author)
+class AuthorAdmin(admin.ModelAdmin):
+    list_display = ('first_name', 'last_name', 'book')
+    search_fields = ('first_name', 'last_name')
 
-admin.site.register(Book, BookAdmin)
+@admin.register(Tag)
+class TagAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+    search_fields = ('name',)
