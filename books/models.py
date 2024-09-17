@@ -31,6 +31,11 @@ class Book(models.Model):
         if not self.tags.exists():
             default_tag, _created = Tag.objects.get_or_create(name='tag_not_set')
             self.tags.add(default_tag)
+            
+    class Meta:
+        permissions = [
+            ("can_edit_book", "Can edit book"),
+        ]
 
 class Tag(models.Model):
     name = models.CharField(max_length=50, unique=True)

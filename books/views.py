@@ -1,9 +1,12 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.forms import formset_factory
 from django.db.models import Count, F
+from django.core.exceptions import PermissionDenied
 
 from .models import Book, Author, Tag
 from .forms import BookForm, AuthorInlineFormset
+
+
 
 def books_with_matching_authors(request):
     books = Book.objects.filter(authors__first_name=F('authors__last_name')).distinct()
@@ -31,3 +34,24 @@ def add_book(request):
         formset = AuthorInlineFormset(instance=Book())
 
     return render(request, 'books/add_book.html', {'book_form': book_form, 'formset': formset})
+
+def edit_book(request, book_id):
+    book = get_object_or_404(Book, id=book_id)
+
+    if not request.user.has_perm('books.can_edit_book'):
+        raise PermissionDenied
+
+    if request.method == 'POST':
+        book_form = BookForm(request.POST, instance=book)
+        formset = AuthorInlineFormset(request.POST, instance=book)
+
+        if book_form.is_valid() and formset.is_valid():
+            book_form.save()
+            formset.save()
+            return redirect('/books/')
+    else:
+        book_form = BookForm(instance=book)
+        formset = AuthorInlineFormset(instance=book)
+
+    return render(request, 'books/edit_book.html', {'book_form': book_form, 'formset': formset})
+    
