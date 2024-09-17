@@ -1,14 +1,16 @@
 from django.shortcuts import render, redirect
 from django.forms import formset_factory
+from django.db.models import Count
 
-from .models import Book, Author
+from .models import Book, Author, Tag
 from .forms import BookForm, AuthorInlineFormset
 
 
 def book_list(request):
-    books = Book.objects.all()
-    return render(request, 'books/book_list.html', {'books': books})
+    books = Book.objects.annotate(tag_count=Count('tags'))
+    total_tags_count = Tag.objects.annotate(book_count=Count('books')).aggregate(total_tags=Count('id'))['total_tags']
 
+    return render(request, 'books/book_list.html', {'books': books, 'total_tags_count': total_tags_count})
 
 def add_book(request):
     if request.method == 'POST':

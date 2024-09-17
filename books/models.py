@@ -7,6 +7,13 @@ def validate_integer_price(value):
         raise ValidationError('The price must be integer')
 
 
+class Tag(models.Model):
+    name = models.CharField(max_length=50, unique=True)
+
+    def __str__(self):
+        return self.name
+        
+        
 class Author(models.Model):
     name = models.CharField(max_length=100)
     book = models.ForeignKey('Book', related_name='authors', on_delete=models.CASCADE)
@@ -29,6 +36,7 @@ class Book(models.Model):
         ]
     )
     count = models.IntegerField()
+    tags = models.ManyToManyField(Tag, related_name='books', blank=True)
 
     def __str__(self):
         return self.title
