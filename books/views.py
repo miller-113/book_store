@@ -5,9 +5,6 @@ from django.db.models import Count, F
 from .models import Book, Author, Tag
 from .forms import BookForm, AuthorInlineFormset
 
-
-
-
 def books_with_matching_authors(request):
     books = Book.objects.filter(authors__first_name=F('authors__last_name')).distinct()
 
@@ -34,4 +31,3 @@ def add_book(request):
         formset = AuthorInlineFormset(instance=Book())
 
     return render(request, 'books/add_book.html', {'book_form': book_form, 'formset': formset})
-    

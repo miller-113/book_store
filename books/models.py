@@ -1,6 +1,8 @@
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator
 from django.db import models
+from django.db.models.signals import m2m_changed, post_save
+from django.dispatch import receiver
 
 def validate_integer_price(value):
     if value != int(value):
@@ -25,6 +27,11 @@ class Book(models.Model):
     def __str__(self):
         return self.title
 
+    def assign_default_tag(self):
+        if not self.tags.exists():
+            default_tag, _created = Tag.objects.get_or_create(name='tag_not_set')
+            self.tags.add(default_tag)
+
 class Tag(models.Model):
     name = models.CharField(max_length=50, unique=True)
 
@@ -38,3 +45,15 @@ class Author(models.Model):
 
     def __str__(self):
         return f"{self.first_name} {self.last_name}"
+
+
+@receiver(post_save, sender=Book)
+def handle_book_save(sender, instance, **kwargs):
+    instance.assign_default_tag()
+
+@receiver(m2m_changed, sender=Book.tags.through)
+def handle_book_tags_change(sender, instance, action, **kwargs):
+    if action == 'post_remove' or action == 'post_clear':
+        if not instance.tags.exists():
+            default_tag, _created = Tag.objects.get_or_create(name='tag_not_set')
+            instance.tags.add(default_tag)
