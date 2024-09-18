@@ -52,6 +52,16 @@ class Author(models.Model):
         return f"{self.first_name} {self.last_name}"
 
 
+class HttpRequestLog(models.Model):
+    path = models.CharField(max_length=255)
+    method = models.CharField(max_length=10)
+    timestamp = models.DateTimeField(auto_now_add=True)
+    user = models.CharField(max_length=100, blank=True, null=True)
+    remote_addr = models.CharField(max_length=45)  # To store IPv6 addresses
+
+    def __str__(self):
+        return f"{self.method} {self.path} at {self.timestamp}"
+
 @receiver(post_save, sender=Book)
 def handle_book_save(sender, instance, **kwargs):
     instance.assign_default_tag()

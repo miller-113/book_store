@@ -3,9 +3,8 @@ from django.forms import formset_factory
 from django.db.models import Count, F
 from django.core.exceptions import PermissionDenied
 
-from .models import Book, Author, Tag
+from .models import Book, Author, Tag, HttpRequestLog
 from .forms import BookForm, AuthorInlineFormset
-
 
 
 def books_with_matching_authors(request):
@@ -54,4 +53,7 @@ def edit_book(request, book_id):
         formset = AuthorInlineFormset(instance=book)
 
     return render(request, 'books/edit_book.html', {'book_form': book_form, 'formset': formset})
-    
+
+def last_10_requests(request):
+    last_10_logs = HttpRequestLog.objects.order_by('-timestamp')[:10]
+    return render(request, 'books/last_10_requests.html', {'logs': last_10_logs})
