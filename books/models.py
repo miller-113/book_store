@@ -24,6 +24,10 @@ class Book(models.Model):
     count = models.IntegerField()
     tags = models.ManyToManyField('Tag', related_name='books', blank=True)
     publish_date = models.DateField(null=True, blank=True) 
+    
+    @property
+    def tag_count(self):
+        return self.tags.count()
 
     def __str__(self):
         return self.title

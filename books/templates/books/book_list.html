@@ -16,6 +16,7 @@
             <th>ISBN</th>
             <th>Price</th>
             <th>Count</th>
+            <th>Tag Count</th> 
             <th>Actions</th>
         </tr>
     </thead>
@@ -28,6 +29,7 @@
             <td>{{ book.isbn }}</td>
             <td>{{ book.price }}</td>
             <td>{{ book.count }}</td>
+            <td>{{ book.tag_count }}</td> 
             <td><a href="{% admin_edit book %}">Edit in Admin</a></td>
         </tr>
         {% endfor %}

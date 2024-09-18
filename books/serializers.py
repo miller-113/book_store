@@ -3,9 +3,22 @@ from .models import Book
 from datetime import datetime
 
 class BookSerializer(serializers.ModelSerializer):
+    tag_count = serializers.IntegerField(read_only=True)
+    
     class Meta:
         model = Book
-        fields = '__all__'
+        fields = [
+            'id',
+            'store',
+            'title',
+            'genre',
+            'isbn',
+            'price',
+            'count',
+            'tags',
+            'publish_date',
+            "tag_count",
+        ]
 
     def validate_isbn(self, value):
         if not value.startswith('9'):
