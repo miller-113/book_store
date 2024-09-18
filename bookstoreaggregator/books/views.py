@@ -4,19 +4,19 @@ from django.db.models import Count, F
 from django.core.exceptions import PermissionDenied
 
 from .models import Book, Author, Tag, HttpRequestLog
+from .serializers import BookSerializer
 from .forms import BookForm, AuthorInlineFormset
 
 
 def books_with_matching_authors(request):
     books = Book.objects.filter(authors__first_name=F('authors__last_name')).distinct()
-
     return render(request, 'books/books_with_matching_authors.html', {'books': books})
 
-def book_list(request):
-    books = Book.objects.annotate(tag_count=Count('tags'))
-    total_tags_count = Tag.objects.annotate(book_count=Count('books')).aggregate(total_tags=Count('id'))['total_tags']
 
-    return render(request, 'books/book_list.html', {'books': books, 'total_tags_count': total_tags_count})
+def book_list(request):
+    books = Book.objects.all()
+    return render(request, 'books/book_list.html', {'books': books})
+
 
 def add_book(request):
     if request.method == 'POST':
@@ -24,9 +24,21 @@ def add_book(request):
         formset = AuthorInlineFormset(request.POST, instance=Book())
 
         if book_form.is_valid() and formset.is_valid():
-            book = book_form.save()
-            formset.instance = book
-            formset.save()
+            book_data = book_form.cleaned_data
+            authors_data = formset.cleaned_data
+
+            Book.objects.create_book(
+                owner=request.user,
+                store=book_data['store'],
+                title=book_data['title'],
+                genre=book_data['genre'],
+                isbn=book_data['isbn'],
+                price=book_data['price'],
+                count=book_data['count'],
+                publish_date=book_data.get('publish_date'),
+                authors=authors_data
+            )
+
             return redirect('/books/')
     else:
         book_form = BookForm()
@@ -34,10 +46,11 @@ def add_book(request):
 
     return render(request, 'books/add_book.html', {'book_form': book_form, 'formset': formset})
 
+
 def edit_book(request, book_id):
     book = get_object_or_404(Book, id=book_id)
 
-    if not request.user.has_perm('books.can_edit_book'):
+    if book.owner != request.user:
         raise PermissionDenied
 
     if request.method == 'POST':
@@ -45,8 +58,21 @@ def edit_book(request, book_id):
         formset = AuthorInlineFormset(request.POST, instance=book)
 
         if book_form.is_valid() and formset.is_valid():
-            book_form.save()
-            formset.save()
+            book_data = book_form.cleaned_data
+            authors_data = formset.cleaned_data
+
+            Book.objects.update_book(
+                book_id=book.id,
+                store=book_data['store'],
+                title=book_data['title'],
+                genre=book_data['genre'],
+                isbn=book_data['isbn'],
+                price=book_data['price'],
+                count=book_data['count'],
+                publish_date=book_data.get('publish_date'),
+                authors=authors_data
+            )
+
             return redirect('/books/')
     else:
         book_form = BookForm(instance=book)
