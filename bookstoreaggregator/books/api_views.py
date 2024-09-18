@@ -3,6 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 from .models import Book
 from .serializers import BookSerializer
+from .permissions import IsOwner
 from django_filters import rest_framework as filters
 
 class BookFilter(filters.FilterSet):
@@ -16,6 +17,9 @@ class BookFilter(filters.FilterSet):
 class BookViewSet(viewsets.ModelViewSet):
     queryset = Book.objects.all()
     serializer_class = BookSerializer
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated, IsOwner]
     filter_backends = [DjangoFilterBackend]
     filterset_class = BookFilter
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)

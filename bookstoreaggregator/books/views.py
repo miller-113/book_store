@@ -47,7 +47,7 @@ def add_book(request):
 def edit_book(request, book_id):
     book = get_object_or_404(Book, id=book_id)
 
-    if not request.user.has_perm('books.can_edit_book'):
+    if book.owner != request.user:
         raise PermissionDenied
 
     if request.method == 'POST':
@@ -73,6 +73,7 @@ def edit_book(request, book_id):
         formset = AuthorInlineFormset(instance=book)
 
     return render(request, 'books/edit_book.html', {'book_form': book_form, 'formset': formset})
+
 
 def last_10_requests(request):
     last_10_logs = HttpRequestLog.objects.order_by('-timestamp')[:10]

@@ -5,6 +5,7 @@ from django.core.validators import MaxValueValidator
 from django.db import models
 from django.db.models.signals import m2m_changed, post_save
 from django.dispatch import receiver
+from django.contrib.auth.models import User
 
 
 def validate_integer_price(value):
@@ -19,13 +20,13 @@ def validate_integer_price(value):
 class BookManager(models.Manager):
     def create_book(self, **kwargs):
         book = self.model(**kwargs)
-        book.full_clean() 
+        book.full_clean()
         if not book.tags.exists():
             default_tag, _created = Tag.objects.get_or_create(name='tag_not_set')
             book.tags.add(default_tag)
         book.save()
         return book
-    
+
     def update_book(self, book_id, **kwargs):
         book = self.get(pk=book_id)
         for attr, value in kwargs.items():
@@ -38,6 +39,7 @@ class BookManager(models.Manager):
         return book
 
 class Book(models.Model):
+    owner = models.ForeignKey(User, related_name='books', on_delete=models.CASCADE)
     store = models.CharField(max_length=100)
     title = models.CharField(max_length=200)
     genre = models.CharField(max_length=100)
@@ -47,13 +49,13 @@ class Book(models.Model):
         decimal_places=2,
         validators=[
             MaxValueValidator(100),
-            validate_integer_price 
+            validate_integer_price
         ]
     )
     count = models.IntegerField()
     tags = models.ManyToManyField('Tag', related_name='books', blank=True)
-    publish_date = models.DateField(null=True, blank=True) 
-    
+    publish_date = models.DateField(null=True, blank=True)
+
     objects = BookManager()
 
     @property
@@ -69,6 +71,7 @@ class Tag(models.Model):
 
     def __str__(self):
         return self.name
+
 
 class Author(models.Model):
     first_name = models.CharField(max_length=100)
