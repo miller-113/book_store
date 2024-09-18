@@ -76,6 +76,7 @@ DJANGO_APPS = [
     "django.contrib.admin",
     "django.forms",
     'rest_framework',
+    'rest_framework.authtoken',
     'rest_framework_simplejwt',
     'django_filters',
 ]
@@ -83,6 +84,11 @@ THIRD_PARTY_APPS = [
     "crispy_forms",
     "crispy_bootstrap5",
     'dj_rest_auth',
+    "allauth",
+    "allauth.account",
+    "allauth.mfa",
+    "allauth.socialaccount",
+    'allauth.socialaccount.providers.google'
 ]
 
 LOCAL_APPS = [

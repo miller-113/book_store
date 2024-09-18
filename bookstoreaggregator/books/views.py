@@ -25,17 +25,20 @@ def add_book(request):
 
         if book_form.is_valid() and formset.is_valid():
             book_data = book_form.cleaned_data
-            book = Book.objects.create_book(
+            authors_data = formset.cleaned_data
+
+            Book.objects.create_book(
+                owner=request.user,
                 store=book_data['store'],
                 title=book_data['title'],
                 genre=book_data['genre'],
                 isbn=book_data['isbn'],
                 price=book_data['price'],
                 count=book_data['count'],
-                publish_date=book_data.get('publish_date')
+                publish_date=book_data.get('publish_date'),
+                authors=authors_data
             )
-            formset.instance = book
-            formset.save()
+
             return redirect('/books/')
     else:
         book_form = BookForm()
@@ -56,6 +59,8 @@ def edit_book(request, book_id):
 
         if book_form.is_valid() and formset.is_valid():
             book_data = book_form.cleaned_data
+            authors_data = formset.cleaned_data
+
             Book.objects.update_book(
                 book_id=book.id,
                 store=book_data['store'],
@@ -64,16 +69,16 @@ def edit_book(request, book_id):
                 isbn=book_data['isbn'],
                 price=book_data['price'],
                 count=book_data['count'],
-                publish_date=book_data.get('publish_date')
+                publish_date=book_data.get('publish_date'),
+                authors=authors_data
             )
-            formset.save()
+
             return redirect('/books/')
     else:
         book_form = BookForm(instance=book)
         formset = AuthorInlineFormset(instance=book)
 
     return render(request, 'books/edit_book.html', {'book_form': book_form, 'formset': formset})
-
 
 def last_10_requests(request):
     last_10_logs = HttpRequestLog.objects.order_by('-timestamp')[:10]

@@ -3,10 +3,7 @@ from decimal import Decimal
 from django.core.exceptions import ValidationError
 from django.core.validators import MaxValueValidator
 from django.db import models
-from django.db.models.signals import m2m_changed, post_save
-from django.dispatch import receiver
-from django.contrib.auth.models import User
-
+from django.conf import settings
 
 def validate_integer_price(value):
     if isinstance(value, float):
@@ -17,29 +14,40 @@ def validate_integer_price(value):
     if value != value.to_integral_value():
         raise ValidationError('The price must be an integer')
 
+
 class BookManager(models.Manager):
     def create_book(self, **kwargs):
+        authors_data = kwargs.pop('authors', [])
         book = self.model(**kwargs)
         book.full_clean()
+        book.save()
+
         if not book.tags.exists():
             default_tag, _created = Tag.objects.get_or_create(name='tag_not_set')
             book.tags.add(default_tag)
-        book.save()
+
+        for author_data in authors_data:
+            Author.objects.create(book=book, **author_data)
+
         return book
 
     def update_book(self, book_id, **kwargs):
         book = self.get(pk=book_id)
+        authors_data = kwargs.pop('authors', [])
         for attr, value in kwargs.items():
             setattr(book, attr, value)
         book.full_clean()
-        if not book.tags.exists():
-            default_tag, _created = Tag.objects.get_or_create(name='tag_not_set')
-            book.tags.add(default_tag)
         book.save()
+
+        book.authors.clear()
+        for author_data in authors_data:
+            Author.objects.create(book=book, **author_data)
+
         return book
 
+
 class Book(models.Model):
-    owner = models.ForeignKey(User, related_name='books', on_delete=models.CASCADE)
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=False, blank=False)
     store = models.CharField(max_length=100)
     title = models.CharField(max_length=200)
     genre = models.CharField(max_length=100)
