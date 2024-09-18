@@ -1,5 +1,9 @@
+{% extends 'base.html' %}
 {% load book_tags %}
 
+{% block title %}Book List{% endblock %}
+
+{% block content %}
 <h1>Book List</h1>
 <p>Total tags for all books: {{ total_tags_count }}</p>
 
@@ -29,3 +33,4 @@
         {% endfor %}
     </tbody>
 </table>
+{% endblock %}

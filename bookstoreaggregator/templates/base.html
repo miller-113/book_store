@@ -137,5 +137,8 @@
     </script>
     {% endcomment %}
   {% endblock inline_javascript %}
+  <footer>
+      <p>&copy; {{ start_year }}{% if start_year != current_year %}-{{ current_year }}{% endif %} My Site. All rights reserved.</p>
+  </footer>
 </body>
 </html>
