@@ -62,7 +62,7 @@ class HttpRequestLog(models.Model):
     method = models.CharField(max_length=10)
     timestamp = models.DateTimeField(auto_now_add=True)
     user = models.CharField(max_length=100, blank=True, null=True)
-    remote_addr = models.CharField(max_length=45)  # To store IPv6 addresses
+    remote_addr = models.CharField(max_length=45)
 
     def __str__(self):
         return f"{self.method} {self.path} at {self.timestamp}"

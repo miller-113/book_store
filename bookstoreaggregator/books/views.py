@@ -15,9 +15,8 @@ def books_with_matching_authors(request):
 
 def book_list(request):
     books = Book.objects.all()
-    serializer = BookSerializer(books, many=True)
     
-    return render(request, 'books/book_list.html', {'books': serializer.data})
+    return render(request, 'books/book_list.html', {'books': books})
 
 def add_book(request):
     if request.method == 'POST':
