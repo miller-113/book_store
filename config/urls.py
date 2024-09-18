@@ -23,7 +23,7 @@ urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
     # User management
     path("users/", include("bookstoreaggregator.users.urls", namespace="users")),
-    path("accounts/", include("allauth.urls")),
+    path('dj-rest-auth/', include('dj_rest_auth.urls')),
     path('books/', include('books.urls')),
     path('api/', include('books.api_urls')), 
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
